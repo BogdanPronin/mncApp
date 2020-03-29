@@ -70,4 +70,20 @@ public class GroupController {
             ctx.status(200);
         }
     }
+    public static void getById(Context ctx, Dao<Group,Integer> groupDao) throws SQLException, JsonProcessingException {
+        String login = ctx.basicAuthCredentials().getUsername();
+        String password = ctx.basicAuthCredentials().getPassword();
+        if(authorization(login,password)){
+            SimpleModule simpleModule = new SimpleModule();
+            simpleModule.addSerializer(Group.class, new GroupGetSerializer());
+            simpleModule.addSerializer(User.class, new UserForGroupSerializer());
+            simpleModule.addSerializer(Schedule.class,new ScheduleForGroupSerializer());
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(simpleModule);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            String serialized = objectMapper.writeValueAsString(groupDao.queryForId(id));
+            ctx.result(serialized);
+            ctx.status(200);
+        }
+    }
 }

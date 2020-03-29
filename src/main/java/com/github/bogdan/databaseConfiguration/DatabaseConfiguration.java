@@ -17,6 +17,7 @@ public class DatabaseConfiguration {
             TableUtils.createTableIfNotExists(connectionSource, Group.class);
             TableUtils.createTableIfNotExists(connectionSource, Schedule.class);
             TableUtils.createTableIfNotExists(connectionSource, UserGroup.class);
+            TableUtils.createTableIfNotExists(connectionSource, Attendance.class);
         } catch (SQLException e) {
             e.printStackTrace();
         }
