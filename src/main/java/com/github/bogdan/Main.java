@@ -41,7 +41,7 @@ public class Main {
         app.post("/groups",ctx-> GroupController.add(ctx, groupDao));
         app.delete("/groups/:id",ctx -> GroupController.delete(ctx,groupDao));
         app.get("/groups",ctx-> GroupController.get(ctx,groupDao));
-
+        app.get("/groups/:id",ctx-> GroupController.get(ctx,groupDao));
         app.post("/userGroup",ctx -> UserGroupController.add(ctx,userGroupDao));
 
         app.exception(MyException.class, (e, ctx) -> {
