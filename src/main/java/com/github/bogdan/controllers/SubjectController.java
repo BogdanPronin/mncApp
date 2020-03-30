@@ -36,4 +36,7 @@ public class SubjectController {
             }else youAreNotAdmin(ctx);
         }else authorizationFailed(ctx);
     }
+    public static void get(Context ctx, Dao<Subject,Integer> subjectDao){}
+    public static void getById(Context ctx, Dao<Subject,Integer> subjectDao){}
+    public static void change(Context ctx, Dao<Subject,Integer> subjectDao){}
 }

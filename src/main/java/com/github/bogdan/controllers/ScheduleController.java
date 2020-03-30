@@ -48,6 +48,10 @@ public class ScheduleController {
             }else youAreNotAdmin(ctx);
         }else authorizationFailed(ctx);
     }
+    public static void get(Context ctx, Dao<Schedule,Integer> scheduleDao){}
+    public static void getById(Context ctx, Dao<Schedule,Integer> scheduleDao){}
+    public static void change(Context ctx, Dao<Schedule,Integer> scheduleDao){}
+
     public static ArrayList<Schedule> getGroupsSchedule(int groupId) throws SQLException {
         Dao<Schedule,Integer> scheduleDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,Schedule.class);
         ArrayList<Schedule> scheduleArrayList = new ArrayList<>();

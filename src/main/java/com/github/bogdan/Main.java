@@ -24,6 +24,7 @@ public class Main {
         Dao<Schedule,Integer> scheduleDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,Schedule.class);
         Dao<Group,Integer> groupDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,Group.class);
         Dao<UserGroup,Integer> userGroupDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,UserGroup.class);
+        Dao<Attendance,Integer> attendanceDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,Attendance.class);
 
         app.post("/users", ctx -> UserController.add(ctx, userDao));
         app.patch("/users",ctx->UserController.changeUser(ctx,userDao));
@@ -42,7 +43,14 @@ public class Main {
         app.delete("/groups/:id",ctx -> GroupController.delete(ctx,groupDao));
         app.get("/groups",ctx-> GroupController.get(ctx,groupDao));
         app.get("/groups/:id",ctx-> GroupController.getById(ctx,groupDao));
+
         app.post("/userGroup",ctx -> UserGroupController.add(ctx,userGroupDao));
+
+        app.post("/attendance",ctx-> AttendanceController.add(ctx,attendanceDao));
+        app.get("/attendance",ctx-> AttendanceController.get(ctx,attendanceDao));
+        app.get("/attendance/:id",ctx-> AttendanceController.getById(ctx,attendanceDao));
+        app.patch("/attendance/:id",ctx-> AttendanceController.change(ctx,attendanceDao));
+        app.delete("/attendance/:id",ctx-> AttendanceController.delete(ctx,attendanceDao));
 
         app.exception(MyException.class, (e, ctx) -> {
             ctx.result(e.getMessage());

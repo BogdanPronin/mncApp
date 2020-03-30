@@ -9,7 +9,6 @@ import com.github.bogdan.modals.Group;
 import com.github.bogdan.modals.Role;
 import com.github.bogdan.modals.User;
 import com.github.bogdan.modals.UserGroup;
-import com.github.bogdan.serializer.UserGetSerializer;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import io.javalin.http.Context;
@@ -39,6 +38,11 @@ public class UserGroupController {
             created(ctx);
         }else youAreNotAdmin(ctx);
     }
+    public static void get(Context ctx,Dao<UserGroup,Integer> userGroupDao){}
+    public static void getById(Context ctx,Dao<UserGroup,Integer> userGroupDao){}
+    public static void change(Context ctx,Dao<UserGroup,Integer> userGroupDao){}
+    public static void delete(Context ctx,Dao<UserGroup,Integer> userGroupDao){}
+
     public static ArrayList<Group> getUsersGroups(User user) throws SQLException {
         Dao<UserGroup,Integer> userGroupDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,UserGroup.class);
         ArrayList<Group> groupArrayList = new ArrayList<>();
