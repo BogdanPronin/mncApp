@@ -13,8 +13,6 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.j256.ormlite.dao.Dao;
 import io.javalin.http.Context;
 import org.mindrot.jbcrypt.BCrypt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.time.LocalDate;

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.fasterxml.jackson.databind.node.NullNode;
 import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
 import com.github.bogdan.exceptions.MyException;
 import com.github.bogdan.exceptions.WebException;
@@ -20,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import static com.github.bogdan.services.DeserializerService.*;
+
 public class DeserializerForChangeUser  extends StdDeserializer<User> {
     static final Logger LOGGER = LoggerFactory.getLogger(DeserializerForChangeUser.class);
     public DeserializerForChangeUser() {
@@ -32,13 +33,7 @@ public class DeserializerForChangeUser  extends StdDeserializer<User> {
         try {
             Dao<User, Integer> userDao = DaoManager.createDao(DatabaseConfiguration.connectionSource, User.class);
             int id;
-//            String fname;
-//            String lname;
-//            String phone;
-//            String email;
-//            String login;
-//            String password;
-//            Role role;
+
             User u = new User();
             checkForExplicitlyNullField(node.get("id"),"Necessary field id can't be null");
             if(node.get("id")==null){
@@ -96,9 +91,5 @@ public class DeserializerForChangeUser  extends StdDeserializer<User> {
 
     }
 
-    private void checkForExplicitlyNullField(JsonNode node, String exceptionMessage){
-        if (node instanceof NullNode ) {
-            throw new MyException(exceptionMessage);
-        }
-    }
+
 }

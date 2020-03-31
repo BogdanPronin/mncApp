@@ -15,8 +15,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import static com.github.bogdan.services.AuthService.authorization;
 import static com.github.bogdan.services.ContextService.*;
-import static com.github.bogdan.services.LocalDateService.checkLocalDateTimeFormat;
-import static com.github.bogdan.services.LocalDateService.checkValidTime;
 import static com.github.bogdan.services.ScheduleService.checkIsThisSchedulePossible;
 import static com.github.bogdan.services.UserService.getUserByLogin;
 
@@ -59,7 +57,7 @@ public class ScheduleController {
     }
     public static void getById(Context ctx, Dao<Schedule,Integer> scheduleDao){}
     public static void change(Context ctx, Dao<Schedule,Integer> scheduleDao){}
-
+    //возвращает лист расписаний данной группы
     public static ArrayList<Schedule> getGroupsSchedule(int groupId) throws SQLException {
         Dao<Schedule,Integer> scheduleDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,Schedule.class);
         ArrayList<Schedule> scheduleArrayList = new ArrayList<>();

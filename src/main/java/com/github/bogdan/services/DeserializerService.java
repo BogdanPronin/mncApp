@@ -3,9 +3,12 @@ package com.github.bogdan.services;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.github.bogdan.exceptions.WebException;
+import java.time.LocalDate;
+import static com.github.bogdan.services.LocalDateService.checkLocalDateFormat;
 
 public class DeserializerService {
-    public static String getFieldValue(JsonNode node, String field){
+    //проверяет на null или пустое поле. Если все хорошо возвращает String, иначе кидает ошибку
+    public static String getStringFieldValue(JsonNode node, String field){
         checkForExplicitlyNullField(node.get(field),"Necessary field \""+field+ "\" can't be null");
         if(node.get(field) == null){
             throw new WebException("Necessary field \""+field+ "\" can't be null",400);
@@ -13,6 +16,7 @@ public class DeserializerService {
             throw new WebException("Necessary field \""+field+ "\" can't be null",400);
         } else return node.get(field).asText();
     }
+    //проверяет на пустое поле. Если все хорошо возвращает int, иначе кидает ошибку
     public static int getIntFieldValue(JsonNode node, String field){
         checkForExplicitlyNullField(node.get(field),"Necessary field \""+field+ "\" can't be null");
         if(node.get(field) == null){
@@ -21,6 +25,7 @@ public class DeserializerService {
             throw new WebException("Necessary field \""+field+ "\" can't be null",400);
         }else return node.get(field).asInt();
     }
+    //проверяет на пустое поле. Если все хорошо возвращает boolean, иначе кидает ошибку
     public static boolean getBooleanFieldValue(JsonNode node,String field){
         checkForExplicitlyNullField(node.get(field),"Necessary field \""+field+ "\" can't be null");
         if(node.get(field) == null){
@@ -29,7 +34,22 @@ public class DeserializerService {
             throw new WebException("Necessary field \""+field+ "\" can't be null",400);
         } else return node.get(field).asBoolean();
     }
-    private static void checkForExplicitlyNullField(JsonNode node, String exceptionMessage){
+    //проверяет на null или пустое поле.
+    // Если все хорошо проверяет на правильность введения даты и возвращает String, иначе кидает ошибку
+    public static String getDateFieldValue(JsonNode node, String field){
+        if(node.get(field) == null){
+            LocalDate localDate = LocalDate.now();
+            return localDate.toString();
+        }else if(node.get(field).asText()==""){
+            LocalDate localDate = LocalDate.now();
+            return localDate.toString();
+        } else {
+            checkLocalDateFormat(node.get(field).asText());
+            return node.get(field).asText();
+        }
+    }
+
+    public static void checkForExplicitlyNullField(JsonNode node, String exceptionMessage){
         if (node instanceof NullNode) {
             throw new WebException(exceptionMessage,400);
         }

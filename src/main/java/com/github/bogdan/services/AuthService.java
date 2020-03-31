@@ -1,6 +1,7 @@
 package com.github.bogdan.services;
 
 import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
+import com.github.bogdan.exceptions.WebException;
 import com.github.bogdan.modals.User;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -25,7 +26,7 @@ public class AuthService {
     }
     public static void checkAuthorization(String login, String password, Context ctx) throws SQLException {
         if(authorization(login,password)){
-        }else authorizationFailed(ctx);
+        }else throw new WebException("Authorization failed",400);
     }
 
 }

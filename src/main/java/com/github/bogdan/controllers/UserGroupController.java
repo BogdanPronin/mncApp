@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
 import com.github.bogdan.deserializer.UserGroupDeserializer;
+import com.github.bogdan.exceptions.WebException;
 import com.github.bogdan.modals.Group;
 import com.github.bogdan.modals.Role;
 import com.github.bogdan.modals.User;
@@ -12,10 +13,8 @@ import com.github.bogdan.modals.UserGroup;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import io.javalin.http.Context;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import static com.github.bogdan.services.AuthService.*;
 import static com.github.bogdan.services.ContextService.*;
 import static com.github.bogdan.services.UserGroupService.checkIsSuchRecordExists;
@@ -43,6 +42,7 @@ public class UserGroupController {
     public static void change(Context ctx,Dao<UserGroup,Integer> userGroupDao){}
     public static void delete(Context ctx,Dao<UserGroup,Integer> userGroupDao){}
 
+    //возвращает лист групп, в которых состоит user
     public static ArrayList<Group> getUsersGroups(User user) throws SQLException {
         Dao<UserGroup,Integer> userGroupDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,UserGroup.class);
         ArrayList<Group> groupArrayList = new ArrayList<>();
@@ -53,6 +53,7 @@ public class UserGroupController {
         }
         return groupArrayList;
     }
+    //возвращает лист user'ов, состоящих в этой группе
     public static ArrayList<User> getGroupsUsers(Group group) throws SQLException {
         Dao<UserGroup,Integer> userGroupDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,UserGroup.class);
         ArrayList<User> userArrayList = new ArrayList<>();
@@ -62,5 +63,18 @@ public class UserGroupController {
             }
         }
         return userArrayList;
+    }
+    //проверка: состоит ли данный user в данной группе
+    public static void checkUserInGroup(int userId,int groupId) throws SQLException {
+        Dao<UserGroup,Integer> userGroupDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,UserGroup.class);
+        boolean userInGroup=false;
+        for (UserGroup ug:userGroupDao.queryForAll()){
+            if(ug.getUser().getId()==userId && ug.getGroup().getId()==groupId){
+                userInGroup=true;
+            }
+        }
+        if(!userInGroup){
+            throw new WebException("User isn't in this group",400);
+        }
     }
 }

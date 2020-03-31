@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.fasterxml.jackson.databind.node.NullNode;
 import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
 import com.github.bogdan.exceptions.WebException;
 import com.github.bogdan.modals.Group;
@@ -17,7 +16,7 @@ import com.j256.ormlite.dao.DaoManager;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalDate;
+
 import static com.github.bogdan.services.DeserializerService.*;
 import static com.github.bogdan.services.LocalDateService.checkLocalDateFormat;
 
@@ -40,7 +39,7 @@ public class UserGroupDeserializer extends StdDeserializer<UserGroup> {
         try {
 
 
-            String dateOfEnrollment;
+
             String dateOfDrop;
             userDao = DaoManager.createDao(DatabaseConfiguration.connectionSource, User.class);
             groupDao = DaoManager.createDao(DatabaseConfiguration.connectionSource, Group.class);
@@ -55,16 +54,8 @@ public class UserGroupDeserializer extends StdDeserializer<UserGroup> {
                 throw new WebException("Group with such id doesn't exist",400);
             }
 
-            if (node.get("dateOfEnrollment") == null) {
-                LocalDate localDate = LocalDate.now();
-                dateOfEnrollment = localDate.toString();
-            }else if(node.get("dateOfEnrollment").asText() == ""){
-                LocalDate localDate = LocalDate.now();
-                dateOfEnrollment = localDate.toString();
-            }else {
-                dateOfEnrollment = node.get("dateOfEnrollment").asText();
-                checkLocalDateFormat(dateOfEnrollment);
-            }
+            String dateOfEnrollment = getDateFieldValue(node,"dateOfEnrollment");
+
             if (node.get("dateOfDrop") == null ) {
                 dateOfDrop = null;
             }else if(node.get("dateOfDrop").asText() == ""){

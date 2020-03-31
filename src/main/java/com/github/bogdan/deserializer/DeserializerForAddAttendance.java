@@ -16,6 +16,7 @@ import com.j256.ormlite.dao.DaoManager;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import static com.github.bogdan.controllers.UserGroupController.checkUserInGroup;
 import static com.github.bogdan.services.DeserializerService.*;
 import static com.github.bogdan.services.LocalDateService.checkLocalDateFormat;
 
@@ -31,16 +32,23 @@ public class DeserializerForAddAttendance extends StdDeserializer<Attendance> {
             int userId = getIntFieldValue(node,"userId");
             Dao<User,Integer> userDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,User.class);
             if(userDao.queryForId(userId)==null){
-                throw new WebException("Necessary field \"userId\" can't be null",400);
+                throw new WebException("Such user isn't exist",400);
             }
+
             int groupId = getIntFieldValue(node,"groupId");
             Dao<Group,Integer> groupDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,Group.class);
-            if(groupDao.queryForId(groupId)==null){
-                throw new WebException("Necessary field \"groupId\" can't be null",400);
+            if(groupDao.queryForId(groupId)==null) {
+                throw new WebException("Such group isn't exist", 400);
             }
-            String date = getFieldValue(node,"date");
+
+            checkUserInGroup(userId,groupId);
+
+            String date = getDateFieldValue(node,"date");
+
             checkLocalDateFormat(date);
+
             boolean isAttends = getBooleanFieldValue(node,"isAttends");
+
             return new Attendance(userDao.queryForId(userId),groupDao.queryForId(groupId),date,isAttends);
         } catch (SQLException e) {
             e.printStackTrace();

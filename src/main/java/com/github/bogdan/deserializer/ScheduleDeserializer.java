@@ -17,7 +17,7 @@ import com.j256.ormlite.dao.DaoManager;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static com.github.bogdan.services.DeserializerService.getFieldValue;
+import static com.github.bogdan.services.DeserializerService.getStringFieldValue;
 import static com.github.bogdan.services.DeserializerService.getIntFieldValue;
 
 public class ScheduleDeserializer  extends StdDeserializer<Schedule> {
@@ -29,9 +29,9 @@ public class ScheduleDeserializer  extends StdDeserializer<Schedule> {
     public Schedule deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
         try {
             JsonNode node = jsonParser.getCodec().readTree(jsonParser);
-            String startOfTheLesson = getFieldValue(node,"startOfTheLesson");
-            String endOfTheLesson = getFieldValue(node,"endOfTheLesson");
-            String day = getFieldValue(node,"day");
+            String startOfTheLesson = getStringFieldValue(node,"startOfTheLesson");
+            String endOfTheLesson = getStringFieldValue(node,"endOfTheLesson");
+            String day = getStringFieldValue(node,"day");
             int cabinet = getIntFieldValue(node,"cabinet");
             int groupId = getIntFieldValue(node,"groupId");
             Dao<Group,Integer> groupDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,Group.class);

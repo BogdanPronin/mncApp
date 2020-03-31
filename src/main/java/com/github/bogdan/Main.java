@@ -50,7 +50,7 @@ public class Main {
         app.post("/attendance",ctx-> AttendanceController.add(ctx,attendanceDao));
         app.get("/attendance",ctx-> AttendanceController.get(ctx,attendanceDao));
         app.get("/attendance/:id",ctx-> AttendanceController.getById(ctx,attendanceDao));
-        app.patch("/attendance/:id",ctx-> AttendanceController.change(ctx,attendanceDao));
+        //app.patch("/attendance/:id",ctx-> AttendanceController.change(ctx,attendanceDao));
         app.delete("/attendance/:id",ctx-> AttendanceController.delete(ctx,attendanceDao));
 
         app.exception(MyException.class, (e, ctx) -> {
