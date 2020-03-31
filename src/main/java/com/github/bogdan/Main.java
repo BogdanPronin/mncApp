@@ -38,6 +38,7 @@ public class Main {
 
         app.post("/schedule", ctx -> ScheduleController.add(ctx, scheduleDao));
         app.delete("/schedule/:id",ctx -> ScheduleController.delete(ctx,scheduleDao));
+        app.get("/schedule",ctx-> ScheduleController.get(ctx,scheduleDao));
 
         app.post("/groups",ctx-> GroupController.add(ctx, groupDao));
         app.delete("/groups/:id",ctx -> GroupController.delete(ctx,groupDao));

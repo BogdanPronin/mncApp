@@ -30,4 +30,22 @@ public class LocalDateService {
             throw new WebException("Wrong time format, correct date format should be HH:mm"+'\n'+e.getMessage(),400);
         }
     }
+    public static void checkValidTime(String startOfTheLesson,String endOfTheLesson){
+        LocalTime start = LocalTime.parse(startOfTheLesson);
+        LocalTime end = LocalTime.parse(endOfTheLesson);
+        if(start.equals(end)){
+            throw new WebException("Start of the lesson cannot coincide with the end",400);
+        }else if(!start.isBefore(end)){
+            throw new WebException("Wrong time format start of the lesson must be before the end",400);
+        }
+    }
+    public static void checkForOverlappingTime(String startOfTheFirstGroupsLesson,String endOfTheFirstGroupsLesson,String startOfTheSecondGroupsLesson,String endOfTheSecondGroupsLesson){
+        LocalTime start1 = LocalTime.parse(startOfTheFirstGroupsLesson);
+        LocalTime end1 = LocalTime.parse(endOfTheFirstGroupsLesson);
+        LocalTime start2 = LocalTime.parse(startOfTheSecondGroupsLesson);
+        LocalTime end2 = LocalTime.parse(endOfTheSecondGroupsLesson);
+        if((end1.isBefore(start2) || end1.equals(start2)) || (end2.isBefore(start1) || end2.equals(start1))){
+        }else throw new WebException("At this time, another group is engaged",400);
+
+    }
 }
