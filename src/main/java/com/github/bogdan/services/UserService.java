@@ -13,6 +13,7 @@ import org.apache.commons.validator.routines.EmailValidator;
 import java.sql.SQLException;
 
 public class UserService {
+
     public static User getUserByLogin(String login) throws SQLException {
         Dao<User, Integer> userDao = DaoManager.createDao(DatabaseConfiguration.connectionSource, User.class);
         for (User u:userDao.queryForAll()){
@@ -89,10 +90,10 @@ public class UserService {
         }
         return false;
     }
-    public static void doesUserWithSuchIdExists(int userId) throws SQLException {
+    public static void checkDoesUserWithSuchIdExists(int userId) throws SQLException {
         Dao<User, Integer> userDao = DaoManager.createDao(DatabaseConfiguration.connectionSource, User.class);
         if(userDao.queryForId(userId)==null){
-            throw new WebException("Such user doesn't exists",400);
+            throw new WebException("Such user doesn't exist",400);
         }
     }
     public static User getUserWithSuchLogin(String login) throws SQLException {

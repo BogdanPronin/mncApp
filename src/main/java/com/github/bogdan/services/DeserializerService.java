@@ -16,6 +16,25 @@ public class DeserializerService {
             throw new WebException("Necessary field \""+field+ "\" can't be null",400);
         } else return node.get(field).asText();
     }
+    public static String getNullableStringFielValue(JsonNode node, String field){
+        if(node instanceof NullNode){
+            return null;
+        }else if(node.get(field) == null){
+            return null;
+        }else if(node.get(field).asText()==""){
+            return null;
+        } else return node.get(field).asText();
+    }
+    public static int getNullableIntFielValue(JsonNode node, String field){
+        if(node instanceof NullNode){
+            return -1;
+        }else if(node.get(field) == null){
+            return -1;
+        }else if(node.get(field).asText()==""){
+            return -1;
+        } else return node.get(field).asInt();
+    }
+
     //проверяет на пустое поле. Если все хорошо возвращает int, иначе кидает ошибку
     public static int getIntFieldValue(JsonNode node, String field){
         checkForExplicitlyNullField(node.get(field),"Necessary field \""+field+ "\" can't be null");

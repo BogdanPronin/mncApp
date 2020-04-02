@@ -20,6 +20,13 @@ public class UserGroupService {
             }
         }
     }
+
+    public static void checkDoesSuchRecordExist(int id) throws SQLException {
+        Dao<UserGroup,Integer> userGroupDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,UserGroup.class);
+        if(userGroupDao.queryForId(id)==null){
+            throw new WebException("Such record doesn't exist",400);
+        }
+    }
     //проверка: состоит ли данный user в данной группе
     public static void checkDoesUserInThisGroup(int userId,int groupId) throws SQLException {
         Dao<UserGroup,Integer> userGroupDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,UserGroup.class);

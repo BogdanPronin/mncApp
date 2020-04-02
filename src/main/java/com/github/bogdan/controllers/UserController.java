@@ -13,10 +13,8 @@ import com.github.bogdan.serializer.UserGetSerializer;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.j256.ormlite.dao.Dao;
 import io.javalin.http.Context;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
 
 import static com.github.bogdan.services.AuthService.*;
 import static com.github.bogdan.services.ContextService.*;
@@ -24,6 +22,7 @@ import static com.github.bogdan.services.UserService.*;
 
 public class UserController {
     public static void add(Context ctx, Dao<User,Integer> userDao) throws JsonProcessingException, NumberParseException, SQLException {
+        checkDoesBasicAuthIsEmpty(ctx);
         String body = ctx.body();
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addDeserializer(User.class,new DeserializerForAddUser());
@@ -35,7 +34,9 @@ public class UserController {
         created(ctx);
     }
     public static void changeUser(Context ctx, Dao<User,Integer> userDao) throws SQLException, JsonProcessingException, NumberParseException {
+        checkDoesBasicAuthIsEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())) {
+            checkDoesRequestBodyIsEmpty(ctx);
             String body = ctx.body();
             SimpleModule simpleModule = new SimpleModule();
             simpleModule.addDeserializer(User.class, new DeserializerForChangeUser());
@@ -77,11 +78,13 @@ public class UserController {
 
     }
     public static void delete(Context ctx, Dao<User,Integer> userDao) throws SQLException {
+        checkDoesBasicAuthIsEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
-        int id = Integer.parseInt(ctx.pathParam("id"));
+
         if(authorization(login,password)){
-            doesUserWithSuchIdExists(id);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            checkDoesUserWithSuchIdExists(id);
             if(getUserByLogin(login).getRole()==Role.ADMIN){
                 if(id != getUserByLogin(login).getId() && userDao.queryForId(id).getRole() == Role.ADMIN){
                     throw new WebException("You can't change Admin's fields",400);
@@ -97,11 +100,12 @@ public class UserController {
         }else authorizationFailed(ctx);
     }
     public static void getUser(Context ctx, Dao<User,Integer> userDao) throws SQLException, JsonProcessingException {
+        checkDoesBasicAuthIsEmpty(ctx);
         int id = Integer.parseInt(ctx.pathParam("id"));
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         if(authorization(login,password)){
-            doesUserWithSuchIdExists(id);
+            checkDoesUserWithSuchIdExists(id);
             SimpleModule simpleModule = new SimpleModule();
             simpleModule.addSerializer(User.class, new UserGetSerializer());
             ObjectMapper objectMapper = new ObjectMapper();
@@ -112,7 +116,7 @@ public class UserController {
         }else authorizationFailed(ctx);
     }
     public static void getUsers(Context ctx, Dao<User,Integer> userDao) throws SQLException, JsonProcessingException {
-
+        checkDoesBasicAuthIsEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         if(authorization(login,password)){

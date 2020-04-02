@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import static com.github.bogdan.services.ContextService.authorizationFailed;
 
 public class AuthService {
+
     public static boolean authorization(String login, String  password) throws SQLException {
         Dao<User, Integer> userDao = DaoManager.createDao(DatabaseConfiguration.connectionSource, User.class);
 

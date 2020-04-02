@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
+import com.github.bogdan.deserializer.DeserializerForChangeSchedule;
 import com.github.bogdan.deserializer.ScheduleDeserializer;
 import com.github.bogdan.modals.Role;
 import com.github.bogdan.modals.Schedule;
@@ -15,15 +16,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import static com.github.bogdan.services.AuthService.authorization;
 import static com.github.bogdan.services.ContextService.*;
-import static com.github.bogdan.services.ScheduleService.checkDoesScheduleWithSuchIdExists;
-import static com.github.bogdan.services.ScheduleService.checkDoesThisSchedulePossible;
+import static com.github.bogdan.services.ScheduleService.*;
 import static com.github.bogdan.services.UserService.getUserByLogin;
 
 public class ScheduleController {
     public static void add(Context ctx, Dao<Schedule,Integer> scheduleDao) throws SQLException, JsonProcessingException {
-        basicAuthIsEmpty(ctx);
+        checkDoesBasicAuthIsEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
+                checkDoesRequestBodyIsEmpty(ctx);
                 SimpleModule simpleModule = new SimpleModule();
                 simpleModule.addDeserializer(Schedule.class,new ScheduleDeserializer());
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -31,6 +32,7 @@ public class ScheduleController {
 
                 Schedule s = objectMapper.readValue(ctx.body(),Schedule.class);
                 checkDoesThisSchedulePossible(s);
+                checkDoesSuchScheduleRecordExist(s);
                 scheduleDao.create(s);
                 created(ctx);
             }else youAreNotAdmin(ctx);
@@ -38,10 +40,10 @@ public class ScheduleController {
 
     }
     public static void delete(Context ctx, Dao<Schedule,Integer> scheduleDao) throws SQLException {
-        basicAuthIsEmpty(ctx);
-        int id = Integer.parseInt(ctx.pathParam("id"));
+        checkDoesBasicAuthIsEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
+                int id = Integer.parseInt(ctx.pathParam("id"));
                 checkDoesScheduleWithSuchIdExists(id);
                 scheduleDao.deleteById(id);
                 deleted(ctx);
@@ -49,7 +51,7 @@ public class ScheduleController {
         }else authorizationFailed(ctx);
     }
     public static void get(Context ctx, Dao<Schedule,Integer> scheduleDao) throws SQLException, JsonProcessingException {
-        basicAuthIsEmpty(ctx);
+        checkDoesBasicAuthIsEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -58,7 +60,7 @@ public class ScheduleController {
         }else authorizationFailed(ctx);
     }
     public static void getById(Context ctx, Dao<Schedule,Integer> scheduleDao) throws SQLException, JsonProcessingException {
-        basicAuthIsEmpty(ctx);
+        checkDoesBasicAuthIsEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -68,7 +70,24 @@ public class ScheduleController {
             }else youAreNotAdmin(ctx);
         }else authorizationFailed(ctx);
     }
-    public static void change(Context ctx, Dao<Schedule,Integer> scheduleDao){}
+    public static void change(Context ctx, Dao<Schedule,Integer> scheduleDao) throws SQLException, JsonProcessingException {
+        checkDoesBasicAuthIsEmpty(ctx);
+        if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
+            if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
+                checkDoesRequestBodyIsEmpty(ctx);
+                SimpleModule simpleModule = new SimpleModule();
+                simpleModule.addDeserializer(Schedule.class,new DeserializerForChangeSchedule());
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.registerModule(simpleModule);
+
+                Schedule s = objectMapper.readValue(ctx.body(),Schedule.class);
+                checkDoesThisSchedulePossibleExceptOne(s,s.getId());
+                checkDoesSuchScheduleRecordExist(s);
+                scheduleDao.update(s);
+                updated(ctx);
+            }else youAreNotAdmin(ctx);
+        }else authorizationFailed(ctx);
+    }
     //возвращает лист расписаний данной группы
     public static ArrayList<Schedule> getGroupsSchedule(int groupId) throws SQLException {
         Dao<Schedule,Integer> scheduleDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,Schedule.class);

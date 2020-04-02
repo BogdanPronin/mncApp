@@ -38,24 +38,30 @@ public class Main {
         app.delete("/subjects/:id",ctx -> SubjectController.delete(ctx,subjectDao));
         app.get("/subjects",ctx-> SubjectController.get(ctx,subjectDao));
         app.get("/subjects/:id",ctx-> SubjectController.getById(ctx,subjectDao));
+        app.patch("/subjects/:id",ctx-> SubjectController.getById(ctx,subjectDao));
 
         app.post("/schedule", ctx -> ScheduleController.add(ctx, scheduleDao));
         app.delete("/schedule/:id",ctx -> ScheduleController.delete(ctx,scheduleDao));
         app.get("/schedule",ctx-> ScheduleController.get(ctx,scheduleDao));
         app.get("/schedule/:id",ctx-> ScheduleController.getById(ctx,scheduleDao));
+        app.patch("/schedule",ctx -> ScheduleController.change(ctx,scheduleDao));
 
         app.post("/groups",ctx-> GroupController.add(ctx, groupDao));
         app.delete("/groups/:id",ctx -> GroupController.delete(ctx,groupDao));
         app.get("/groups",ctx-> GroupController.get(ctx,groupDao));
         app.get("/groups/:id",ctx-> GroupController.getById(ctx,groupDao));
+        app.patch("/groups",ctx-> GroupController.change(ctx,groupDao));
 
         app.post("/userGroup",ctx -> UserGroupController.add(ctx,userGroupDao));
         app.delete("/userGroup",ctx -> UserGroupController.deleteUserFromGroup(ctx,userGroupDao));
+        app.delete("/userGroup/:id",ctx -> UserGroupController.deleteRecord(ctx,userGroupDao));
+        app.get("/userGroup/:id",ctx-> UserGroupController.getById(ctx,userGroupDao));
+        app.get("/userGroup",ctx-> UserGroupController.get(ctx,userGroupDao));
 
         app.post("/attendance",ctx-> AttendanceController.add(ctx,attendanceDao));
         app.get("/attendance",ctx-> AttendanceController.get(ctx,attendanceDao));
         app.get("/attendance/:id",ctx-> AttendanceController.getById(ctx,attendanceDao));
-        //app.patch("/attendance/:id",ctx-> AttendanceController.change(ctx,attendanceDao));
+        app.patch("/attendance/:id",ctx-> AttendanceController.change(ctx,attendanceDao));
         app.delete("/attendance/:id",ctx-> AttendanceController.delete(ctx,attendanceDao));
 
         app.exception(MyException.class, (e, ctx) -> {

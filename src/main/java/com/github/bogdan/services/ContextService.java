@@ -25,13 +25,16 @@ public class ContextService {
         ctx.status(200);
         ctx.result("Deleted");
     }
-    public static void basicAuthIsEmpty(Context ctx){
+    public static void checkDoesBasicAuthIsEmpty(Context ctx){
         if (!ctx.basicAuthCredentialsExist()){
+            ctx.status(400);
             throw new MyException("Basic auth is empty");
         }
     }
-    public static void bodyRequestIsEmpty(Context ctx){
-        ctx.status(401);
-        throw new MyException("Request body is empty");
+    public static void checkDoesRequestBodyIsEmpty(Context ctx){
+        if(ctx.body().isEmpty()) {
+            ctx.status(401);
+            throw new MyException("Request body is empty");
+        }
     }
 }

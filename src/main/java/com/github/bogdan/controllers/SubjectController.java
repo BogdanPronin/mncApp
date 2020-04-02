@@ -19,8 +19,10 @@ import static com.github.bogdan.services.UserService.getUserByLogin;
 public class SubjectController {
     static ObjectMapper objectMapper = new ObjectMapper();
     public static void add(Context ctx, Dao<Subject,Integer> subjectDao) throws SQLException, JsonProcessingException {
+        checkDoesBasicAuthIsEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
+                checkDoesRequestBodyIsEmpty(ctx);
                 Subject s = objectMapper.readValue(ctx.body(),Subject.class);
                 checkDoesSubjectWithSuchNameExists(s.getName());
                 subjectDao.create(s);
@@ -29,6 +31,7 @@ public class SubjectController {
         }else authorizationFailed(ctx);
     }
     public static void delete(Context ctx, Dao<Subject,Integer> subjectDao) throws SQLException {
+        checkDoesBasicAuthIsEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
                 int id = Integer.parseInt(ctx.pathParam("id"));
@@ -39,6 +42,7 @@ public class SubjectController {
         }else authorizationFailed(ctx);
     }
     public static void get(Context ctx, Dao<Subject,Integer> subjectDao) throws SQLException, JsonProcessingException {
+        checkDoesBasicAuthIsEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
                 ctx.result(objectMapper.writeValueAsString(subjectDao.queryForAll()));
@@ -56,5 +60,16 @@ public class SubjectController {
             }else youAreNotAdmin(ctx);
         }else authorizationFailed(ctx);
     }
-    public static void change(Context ctx, Dao<Subject,Integer> subjectDao){}
+    public static void change(Context ctx, Dao<Subject,Integer> subjectDao) throws SQLException, JsonProcessingException {
+        checkDoesBasicAuthIsEmpty(ctx);
+        if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
+            if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
+                checkDoesRequestBodyIsEmpty(ctx);
+                Subject s = objectMapper.readValue(ctx.body(),Subject.class);
+                checkDoesSubjectWithSuchNameExists(s.getName());
+                subjectDao.update(s);
+                updated(ctx);
+            }else youAreNotAdmin(ctx);
+        }else authorizationFailed(ctx);
+    }
 }

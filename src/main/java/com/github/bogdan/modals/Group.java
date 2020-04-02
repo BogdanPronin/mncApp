@@ -52,4 +52,14 @@ public class Group {
     public void setSubject(Subject subject) {
         this.subject = subject;
     }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "id=" + id +
+                ", groupName='" + groupName + '\'' +
+                ", subject=" + subject +
+                ", dateOfTheCreation='" + dateOfTheCreation + '\'' +
+                '}';
+    }
 }

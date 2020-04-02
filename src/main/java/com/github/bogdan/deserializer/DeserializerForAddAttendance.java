@@ -53,7 +53,10 @@ public class DeserializerForAddAttendance extends StdDeserializer<Attendance> {
 
             boolean isAttends = getBooleanFieldValue(node,"isAttends");
 
-            boolean isValidReason = getBooleanFieldValue(node,"isValidReason");
+            boolean isValidReason;
+            if(!isAttends) {
+                isValidReason = getBooleanFieldValue(node, "isValidReason");
+            }else isValidReason = true;
 
             return new Attendance(userDao.queryForId(userId),groupDao.queryForId(groupId),date,isAttends,isValidReason);
         } catch (SQLException e) {

@@ -61,6 +61,7 @@ public class Attendance {
         this.date = date;
     }
 
+
     public boolean isAttends() {
         return isAttends;
     }
