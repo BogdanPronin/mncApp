@@ -3,9 +3,9 @@ package com.github.bogdan.deserializer;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
 import com.github.bogdan.exceptions.WebException;
 import com.github.bogdan.modals.Group;
@@ -16,20 +16,16 @@ import com.j256.ormlite.dao.DaoManager;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 import static com.github.bogdan.services.DeserializerService.*;
 import static com.github.bogdan.services.LocalDateService.checkLocalDateFormat;
 import static com.github.bogdan.services.LocalDateService.checkValidDate;
+import static com.github.bogdan.services.UserGroupService.*;
 
-public class UserGroupDeserializer extends StdDeserializer<UserGroup> {
-    public UserGroupDeserializer() { super(UserGroup.class); }
-
-    protected UserGroupDeserializer(JavaType valueType) {
-        super(valueType);
-    }
-
-    protected UserGroupDeserializer(StdDeserializer<?> src) {
-        super(src);
+public class DeserializerForDeleteUserFromGroup extends StdDeserializer<UserGroup> {
+    public DeserializerForDeleteUserFromGroup() {
+        super(UserGroup.class);
     }
 
     @Override
@@ -38,8 +34,6 @@ public class UserGroupDeserializer extends StdDeserializer<UserGroup> {
         Dao<User, Integer> userDao = null;
         Dao<Group, Integer> groupDao = null;
         try {
-
-
 
             String dateOfDrop;
             userDao = DaoManager.createDao(DatabaseConfiguration.connectionSource, User.class);
@@ -55,19 +49,20 @@ public class UserGroupDeserializer extends StdDeserializer<UserGroup> {
                 throw new WebException("Group with such id doesn't exist",400);
             }
 
-            String dateOfEnrollment = getDateFieldValue(node,"dateOfEnrollment");
+            checkDoesUserInThisGroup(userId,groupId);
 
-            if (node.get("dateOfDrop") == null ) {
-                dateOfDrop = null;
+            String dateOfEnrollment = getUserGroup(userId,groupId).getDateOfEnrollment();
+
+            LocalDate localDate = LocalDate.now();
+            if (node.get("dateOfDrop") == null || node.get("dateOfDrop") instanceof NullNode) {
+                dateOfDrop = localDate.toString();
             }else if(node.get("dateOfDrop").asText() == ""){
-                dateOfDrop = null;
+                dateOfDrop = localDate.toString();
             }else {
                 dateOfDrop = node.get("dateOfDrop").asText();
                 checkLocalDateFormat(dateOfDrop);
                 checkValidDate(dateOfEnrollment,dateOfDrop);
             }
-
-
 
             UserGroup userGroup = new UserGroup(userDao.queryForId(userId),groupDao.queryForId(groupId),dateOfEnrollment,dateOfDrop);
             return userGroup;
@@ -76,5 +71,4 @@ public class UserGroupDeserializer extends StdDeserializer<UserGroup> {
         }
         return null;
     }
-
 }

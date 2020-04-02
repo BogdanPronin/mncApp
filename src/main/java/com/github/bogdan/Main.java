@@ -5,6 +5,7 @@ import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
 import com.github.bogdan.exceptions.MyException;
 import com.github.bogdan.exceptions.WebException;
 import com.github.bogdan.modals.*;
+import com.google.i18n.phonenumbers.NumberParseException;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import io.javalin.Javalin;
@@ -35,10 +36,13 @@ public class Main {
 
         app.post("/subjects", ctx -> SubjectController.add(ctx, subjectDao));
         app.delete("/subjects/:id",ctx -> SubjectController.delete(ctx,subjectDao));
+        app.get("/subjects",ctx-> SubjectController.get(ctx,subjectDao));
+        app.get("/subjects/:id",ctx-> SubjectController.getById(ctx,subjectDao));
 
         app.post("/schedule", ctx -> ScheduleController.add(ctx, scheduleDao));
         app.delete("/schedule/:id",ctx -> ScheduleController.delete(ctx,scheduleDao));
         app.get("/schedule",ctx-> ScheduleController.get(ctx,scheduleDao));
+        app.get("/schedule/:id",ctx-> ScheduleController.getById(ctx,scheduleDao));
 
         app.post("/groups",ctx-> GroupController.add(ctx, groupDao));
         app.delete("/groups/:id",ctx -> GroupController.delete(ctx,groupDao));
@@ -46,6 +50,7 @@ public class Main {
         app.get("/groups/:id",ctx-> GroupController.getById(ctx,groupDao));
 
         app.post("/userGroup",ctx -> UserGroupController.add(ctx,userGroupDao));
+        app.delete("/userGroup",ctx -> UserGroupController.deleteUserFromGroup(ctx,userGroupDao));
 
         app.post("/attendance",ctx-> AttendanceController.add(ctx,attendanceDao));
         app.get("/attendance",ctx-> AttendanceController.get(ctx,attendanceDao));
@@ -67,5 +72,10 @@ public class Main {
             ctx.result("Wrong date format, correct date format should be YYYY-MM-DD"+'\n'+e.getMessage());
             e.printStackTrace();
         });
+//        app.exception(NumberParseException.class,(e,ctx)->{
+//            ctx.status(400);
+//            ctx.result("FFFFF");
+//            e.printStackTrace();
+//        });
     }
 }

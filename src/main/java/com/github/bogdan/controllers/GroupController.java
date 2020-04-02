@@ -3,7 +3,6 @@ package com.github.bogdan.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
 import com.github.bogdan.deserializer.DeserializerForAddGroup;
 import com.github.bogdan.modals.Group;
 import com.github.bogdan.modals.Role;
@@ -12,17 +11,15 @@ import com.github.bogdan.modals.User;
 import com.github.bogdan.serializer.GroupGetSerializer;
 import com.github.bogdan.serializer.ScheduleForGroupSerializer;
 import com.github.bogdan.serializer.UserForGroupSerializer;
-import com.github.bogdan.serializer.UserGetSerializer;
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.DaoManager;
 import io.javalin.http.Context;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import static com.github.bogdan.services.AuthService.*;
 import static com.github.bogdan.services.ContextService.*;
-import static com.github.bogdan.services.GroupService.checkIsGroupWithSuchNameIsExist;
+import static com.github.bogdan.services.GroupService.checkDoesGroupWithSuchIdExists;
+import static com.github.bogdan.services.GroupService.checkDoesGroupWithSuchNameExists;
 import static com.github.bogdan.services.LocalDateService.checkLocalDateFormat;
 import static com.github.bogdan.services.UserService.*;
 
@@ -39,7 +36,7 @@ public class GroupController {
 
                 Group g = objectMapperForAddGroup.readValue(body,Group.class);
                 checkLocalDateFormat(g.getDateOfTheCreation());
-                checkIsGroupWithSuchNameIsExist(g.getGroupName());
+                checkDoesGroupWithSuchNameExists(g.getGroupName());
                 groupDao.create(g);
                 created(ctx);
             }else youAreNotAdmin(ctx);
@@ -49,6 +46,7 @@ public class GroupController {
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
                 int id = Integer.parseInt(ctx.pathParam("id"));
+                checkDoesGroupWithSuchIdExists(id);
                 groupDao.delete(groupDao.queryForId(id));
                 deleted(ctx);
             }else youAreNotAdmin(ctx);
@@ -74,13 +72,16 @@ public class GroupController {
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         if(authorization(login,password)){
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            checkDoesGroupWithSuchIdExists(id);
             SimpleModule simpleModule = new SimpleModule();
             simpleModule.addSerializer(Group.class, new GroupGetSerializer());
             simpleModule.addSerializer(User.class, new UserForGroupSerializer());
             simpleModule.addSerializer(Schedule.class,new ScheduleForGroupSerializer());
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(simpleModule);
-            int id = Integer.parseInt(ctx.pathParam("id"));
+
+
             String serialized = objectMapper.writeValueAsString(groupDao.queryForId(id));
             ctx.result(serialized);
             ctx.status(200);

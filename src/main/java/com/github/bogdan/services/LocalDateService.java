@@ -34,7 +34,14 @@ public class LocalDateService {
         if(start.equals(end)){
             throw new WebException("Start of the lesson cannot coincide with the end",400);
         }else if(!start.isBefore(end)){
-            throw new WebException("Wrong time format start of the lesson must be before the end",400);
+            throw new WebException("Start of the lesson must be before the end",400);
+        }
+    }
+    public static void checkValidDate(String dateOfEnrollment,String dateOfDrop){
+        LocalDate first = LocalDate.parse(dateOfEnrollment);
+        LocalDate second = LocalDate.parse(dateOfDrop);
+        if(!first.isBefore(second) ||first.equals(second)){
+            throw new WebException("Date of enrollment cannot be earlier the date of drop",400);
         }
     }
     public static void checkForOverlappingTime(String startOfTheFirstGroupsLesson,String endOfTheFirstGroupsLesson,String startOfTheSecondGroupsLesson,String endOfTheSecondGroupsLesson){

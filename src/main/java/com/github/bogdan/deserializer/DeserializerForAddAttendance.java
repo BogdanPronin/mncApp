@@ -15,10 +15,12 @@ import com.j256.ormlite.dao.DaoManager;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
-import static com.github.bogdan.controllers.UserGroupController.checkUserInGroup;
 import static com.github.bogdan.services.DeserializerService.*;
 import static com.github.bogdan.services.LocalDateService.checkLocalDateFormat;
+import static com.github.bogdan.services.ScheduleService.checkIsThereLessonOnThisDate;
+import static com.github.bogdan.services.UserGroupService.*;
 
 public class DeserializerForAddAttendance extends StdDeserializer<Attendance> {
     public DeserializerForAddAttendance() {
@@ -41,15 +43,19 @@ public class DeserializerForAddAttendance extends StdDeserializer<Attendance> {
                 throw new WebException("Such group isn't exist", 400);
             }
 
-            checkUserInGroup(userId,groupId);
+            checkDoesUserInThisGroup(userId,groupId);
 
             String date = getDateFieldValue(node,"date");
 
             checkLocalDateFormat(date);
+            checkIsThereLessonOnThisDate(date,groupId);
+
 
             boolean isAttends = getBooleanFieldValue(node,"isAttends");
 
-            return new Attendance(userDao.queryForId(userId),groupDao.queryForId(groupId),date,isAttends);
+            boolean isValidReason = getBooleanFieldValue(node,"isValidReason");
+
+            return new Attendance(userDao.queryForId(userId),groupDao.queryForId(groupId),date,isAttends,isValidReason);
         } catch (SQLException e) {
             e.printStackTrace();
         }

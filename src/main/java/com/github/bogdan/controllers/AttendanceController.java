@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.bogdan.deserializer.DeserializerForAddAttendance;
+import com.github.bogdan.exceptions.WebException;
 import com.github.bogdan.modals.Attendance;
 import com.github.bogdan.modals.Role;
 import com.github.bogdan.modals.User;
@@ -14,7 +15,7 @@ import io.javalin.http.Context;
 
 import java.sql.SQLException;
 
-import static com.github.bogdan.controllers.UserGroupController.checkUserInGroup;
+import static com.github.bogdan.services.AttendanceService.checkDoesSuchAttendanceExist;
 import static com.github.bogdan.services.AttendanceService.checkUniqueAttendance;
 import static com.github.bogdan.services.AuthService.*;
 import static com.github.bogdan.services.ContextService.*;
@@ -42,6 +43,7 @@ public class AttendanceController {
         checkAuthorization(login,password,ctx);
         if(getUserByLogin(login).getRole()== Role.ADMIN){
             int id = Integer.parseInt(ctx.pathParam("id"));
+            checkDoesSuchAttendanceExist(id);
             attendanceDao.deleteById(id);
             deleted(ctx);
         }else youAreNotAdmin(ctx);

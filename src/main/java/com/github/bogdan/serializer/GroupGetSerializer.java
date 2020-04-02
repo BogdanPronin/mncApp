@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import static com.github.bogdan.controllers.ScheduleController.getGroupsSchedule;
-import static com.github.bogdan.controllers.UserGroupController.getGroupsUsers;
-import static com.github.bogdan.controllers.UserGroupController.getUsersGroups;
+import static com.github.bogdan.services.UserGroupService.*;
+
 
 public class GroupGetSerializer extends StdSerializer<Group> {
     public GroupGetSerializer() {

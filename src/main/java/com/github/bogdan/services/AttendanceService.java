@@ -19,4 +19,10 @@ public class AttendanceService {
             }
         }
     }
+    public static void checkDoesSuchAttendanceExist(int id) throws SQLException {
+        Dao<Attendance,Integer> attendanceDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,Attendance.class);
+        if(attendanceDao.queryForId(id)==null){
+            throw new WebException("Attendance with such id isn't exist",400);
+        }
+    }
 }

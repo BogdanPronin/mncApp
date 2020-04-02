@@ -3,6 +3,7 @@ package com.github.bogdan.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.github.bogdan.deserializer.DeserializerForAddUser;
 import com.github.bogdan.deserializer.DeserializerForChangeUser;
 import com.github.bogdan.exceptions.MyException;
 import com.github.bogdan.exceptions.WebException;
@@ -22,26 +23,16 @@ import static com.github.bogdan.services.ContextService.*;
 import static com.github.bogdan.services.UserService.*;
 
 public class UserController {
-    static ObjectMapper objectMapper = new ObjectMapper();
     public static void add(Context ctx, Dao<User,Integer> userDao) throws JsonProcessingException, NumberParseException, SQLException {
-        LocalDate localDate = LocalDate.now();
         String body = ctx.body();
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addDeserializer(User.class,new DeserializerForAddUser());
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(simpleModule);
+
         User u = objectMapper.readValue(body, User.class);
-        u.setDateOfRegister(localDate.toString());
-        u.setRole(Role.USER);
-        String hashedPassword = BCrypt.hashpw(u.getPassword(), BCrypt.gensalt(12));
-        u.setPassword(hashedPassword);
-        validateEmail(u,ctx);
-        validatePhone(u,ctx);
-        isPhoneAlreadyInUse(u,ctx);
-        isLoginAlreadyInUse(u,ctx);
-        isEmailAlreadyInUse(u,ctx);
-        try {userDao.create(u);
-            created(ctx);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            //throw new SQLRefactoredException(e.getCause().getMessage());
-        }
+        userDao.create(u);
+        created(ctx);
     }
     public static void changeUser(Context ctx, Dao<User,Integer> userDao) throws SQLException, JsonProcessingException, NumberParseException {
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())) {
@@ -53,8 +44,8 @@ public class UserController {
 
             User u = objectMapperForChangeUser.readValue(body, User.class);
             User currentUser = getUserByLogin(ctx.basicAuthCredentials().getUsername());
-            validateEmail(u,ctx);
-            validatePhone(u,ctx);
+            validateEmail(u);
+            validatePhone(u);
             if(currentUser.getRole()==Role.USER){
                 if(currentUser.getId()==u.getId()){
                     if(u.getRole()==Role.ADMIN){
@@ -90,6 +81,7 @@ public class UserController {
         String password = ctx.basicAuthCredentials().getPassword();
         int id = Integer.parseInt(ctx.pathParam("id"));
         if(authorization(login,password)){
+            doesUserWithSuchIdExists(id);
             if(getUserByLogin(login).getRole()==Role.ADMIN){
                 if(id != getUserByLogin(login).getId() && userDao.queryForId(id).getRole() == Role.ADMIN){
                     throw new WebException("You can't change Admin's fields",400);
@@ -109,6 +101,7 @@ public class UserController {
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         if(authorization(login,password)){
+            doesUserWithSuchIdExists(id);
             SimpleModule simpleModule = new SimpleModule();
             simpleModule.addSerializer(User.class, new UserGetSerializer());
             ObjectMapper objectMapper = new ObjectMapper();

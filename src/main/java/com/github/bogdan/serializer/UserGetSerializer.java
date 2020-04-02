@@ -10,7 +10,7 @@ import com.github.bogdan.modals.User;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static com.github.bogdan.controllers.UserGroupController.getUsersGroups;
+import static com.github.bogdan.services.UserGroupService.*;
 
 public class UserGetSerializer extends StdSerializer<User> {
     public UserGetSerializer() {

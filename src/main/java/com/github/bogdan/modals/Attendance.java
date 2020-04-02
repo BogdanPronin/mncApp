@@ -15,15 +15,18 @@ public class Attendance {
     private String date;
     @DatabaseField
     private boolean isAttends;
+    @DatabaseField
+    private boolean isValidReason;
 
     public Attendance() {
     }
 
-    public Attendance(User user, Group group, String date, boolean isAttends) {
+    public Attendance(User user, Group group, String date, boolean isAttends, boolean isValidReason) {
         this.user = user;
         this.group = group;
         this.date = date;
         this.isAttends = isAttends;
+        this.isValidReason = isValidReason;
     }
 
     public int getId() {
@@ -64,5 +67,13 @@ public class Attendance {
 
     public void setAttends(boolean attends) {
         isAttends = attends;
+    }
+
+    public boolean isValidReason() {
+        return isValidReason;
+    }
+
+    public void setValidReason(boolean validReason) {
+        isValidReason = validReason;
     }
 }
