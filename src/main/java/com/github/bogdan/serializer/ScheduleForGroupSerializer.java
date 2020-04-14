@@ -3,7 +3,7 @@ package com.github.bogdan.serializer;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.github.bogdan.modals.Schedule;
+import com.github.bogdan.models.Schedule;
 
 import java.io.IOException;
 

@@ -1,6 +1,8 @@
-package com.github.bogdan.modals;
+package com.github.bogdan.models;
 
 import com.j256.ormlite.field.DatabaseField;
+
+import java.util.Objects;
 
 public class Group {
     @DatabaseField(generatedId = true)
@@ -61,5 +63,21 @@ public class Group {
                 ", subject=" + subject +
                 ", dateOfTheCreation='" + dateOfTheCreation + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return id == group.id &&
+                Objects.equals(groupName, group.groupName) &&
+                Objects.equals(subject, group.subject) &&
+                Objects.equals(dateOfTheCreation, group.dateOfTheCreation);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, groupName, subject, dateOfTheCreation);
     }
 }

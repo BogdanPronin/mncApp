@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
-import com.github.bogdan.modals.Days;
-import com.github.bogdan.modals.Group;
-import com.github.bogdan.modals.Schedule;
+import com.github.bogdan.models.Days;
+import com.github.bogdan.models.Group;
+import com.github.bogdan.models.Schedule;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 
@@ -18,7 +18,6 @@ import java.sql.SQLException;
 
 import static com.github.bogdan.services.DeserializerService.getIntFieldValue;
 import static com.github.bogdan.services.GroupService.checkDoesGroupWithSuchIdExist;
-import static com.github.bogdan.services.LocalDateService.checkLocalDateFormat;
 import static com.github.bogdan.services.LocalDateService.checkLocalDateTimeFormat;
 import static com.github.bogdan.services.ScheduleService.checkDoesScheduleWithSuchIdExist;
 
@@ -103,7 +102,7 @@ public class DeserializerForChangeSchedule extends StdDeserializer<Schedule> {
                 cabinet = node.get("cabinet").asInt();
                 schedule.setCabinet(cabinet);
             }
-
+            return schedule;
 
         } catch (SQLException e) {
             e.printStackTrace();

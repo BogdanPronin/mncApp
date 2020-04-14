@@ -1,6 +1,6 @@
 package com.github.bogdan.databaseConfiguration;
 
-import com.github.bogdan.modals.*;
+import com.github.bogdan.models.*;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;

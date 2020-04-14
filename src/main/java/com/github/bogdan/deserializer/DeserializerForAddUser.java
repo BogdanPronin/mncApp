@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.github.bogdan.modals.Role;
-import com.github.bogdan.modals.User;
+import com.github.bogdan.models.Role;
+import com.github.bogdan.models.User;
 import com.google.i18n.phonenumbers.NumberParseException;
 import org.mindrot.jbcrypt.BCrypt;
 

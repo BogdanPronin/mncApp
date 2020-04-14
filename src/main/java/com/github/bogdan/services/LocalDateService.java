@@ -50,7 +50,14 @@ public class LocalDateService {
         LocalTime start2 = LocalTime.parse(startOfTheSecondGroupsLesson);
         LocalTime end2 = LocalTime.parse(endOfTheSecondGroupsLesson);
         if((end1.isBefore(start2) || end1.equals(start2)) || (end2.isBefore(start1) || end2.equals(start1))){
-        }else throw new WebException("At this time, another group is engaged",400);
-
+        }else throw new WebException("At this time,another group is engaged",400);
+    }
+    public static void checkForOverlappingTime(String startOfTheFirstGroupsLesson,String endOfTheFirstGroupsLesson,String startOfTheSecondGroupsLesson,String endOfTheSecondGroupsLesson,String mes){
+        LocalTime start1 = LocalTime.parse(startOfTheFirstGroupsLesson);
+        LocalTime end1 = LocalTime.parse(endOfTheFirstGroupsLesson);
+        LocalTime start2 = LocalTime.parse(startOfTheSecondGroupsLesson);
+        LocalTime end2 = LocalTime.parse(endOfTheSecondGroupsLesson);
+        if((end1.isBefore(start2) || end1.equals(start2)) || (end2.isBefore(start1) || end2.equals(start1))){
+        }else throw new WebException(mes,400);
     }
 }

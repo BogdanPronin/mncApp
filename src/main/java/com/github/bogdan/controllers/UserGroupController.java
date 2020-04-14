@@ -3,14 +3,19 @@ package com.github.bogdan.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.github.bogdan.deserializer.DeserializerForChangeUserGroup;
 import com.github.bogdan.deserializer.DeserializerForDeleteUserFromGroup;
 import com.github.bogdan.deserializer.UserGroupDeserializer;
-import com.github.bogdan.modals.Role;
-import com.github.bogdan.modals.User;
-import com.github.bogdan.modals.UserGroup;
+import com.github.bogdan.exceptions.WebException;
+import com.github.bogdan.models.Role;
+import com.github.bogdan.models.User;
+import com.github.bogdan.models.UserGroup;
 import com.github.bogdan.serializer.UserForGroupSerializer;
 import com.j256.ormlite.dao.Dao;
 import io.javalin.http.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.SQLException;
 
 import static com.github.bogdan.services.AuthService.*;
@@ -70,7 +75,25 @@ public class UserGroupController {
             ctx.status(200);
         }else youAreNotAdmin(ctx);
     }
-    public static void change(Context ctx,Dao<UserGroup,Integer> userGroupDao){}
+    public static void change(Context ctx,Dao<UserGroup,Integer> userGroupDao) throws SQLException, JsonProcessingException {
+        checkDoesBasicAuthIsEmpty(ctx);
+        String login = ctx.basicAuthCredentials().getUsername();
+        String password = ctx.basicAuthCredentials().getPassword();
+        checkAuthorization(login,password,ctx);
+        if(getUserByLogin(login).getRole()==Role.ADMIN){
+            checkDoesRequestBodyIsEmpty(ctx);
+            SimpleModule simpleModule = new SimpleModule();
+            simpleModule.addDeserializer(UserGroup.class, new DeserializerForChangeUserGroup());
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(simpleModule);
+            UserGroup ug = objectMapper.readValue(ctx.body(),UserGroup.class);
+            if(ug.equals(userGroupDao.queryForId(ug.getId()))){
+                throw new WebException("You haven't changed anything",400);
+            }
+            userGroupDao.update(ug);
+            updated(ctx);
+        }else youAreNotAdmin(ctx);
+    }
     public static void deleteUserFromGroup(Context ctx,Dao<UserGroup,Integer> userGroupDao) throws SQLException, JsonProcessingException {
         checkDoesBasicAuthIsEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();

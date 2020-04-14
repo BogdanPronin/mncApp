@@ -1,4 +1,4 @@
-package com.github.bogdan.modals;
+package com.github.bogdan.models;
 
 public enum Role {
     USER,

@@ -3,8 +3,12 @@ package com.github.bogdan.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.github.bogdan.modals.Role;
-import com.github.bogdan.modals.Subject;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.github.bogdan.deserializer.DeserializerForChangeGroup;
+import com.github.bogdan.deserializer.DeserializerForChangeSubject;
+import com.github.bogdan.models.Group;
+import com.github.bogdan.models.Role;
+import com.github.bogdan.models.Subject;
 import com.j256.ormlite.dao.Dao;
 import io.javalin.http.Context;
 
@@ -13,7 +17,7 @@ import java.sql.SQLException;
 import static com.github.bogdan.services.AuthService.authorization;
 import static com.github.bogdan.services.ContextService.*;
 import static com.github.bogdan.services.SubjectService.checkDoesSubjectWithSuchIdExists;
-import static com.github.bogdan.services.SubjectService.checkDoesSubjectWithSuchNameExists;
+import static com.github.bogdan.services.SubjectService.checkDoesSubjectWithSuchNameExist;
 import static com.github.bogdan.services.UserService.getUserByLogin;
 
 public class SubjectController {
@@ -24,7 +28,7 @@ public class SubjectController {
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
                 checkDoesRequestBodyIsEmpty(ctx);
                 Subject s = objectMapper.readValue(ctx.body(),Subject.class);
-                checkDoesSubjectWithSuchNameExists(s.getName());
+                checkDoesSubjectWithSuchNameExist(s.getName());
                 subjectDao.create(s);
                 created(ctx);
             }else youAreNotAdmin(ctx);
@@ -65,8 +69,14 @@ public class SubjectController {
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
                 checkDoesRequestBodyIsEmpty(ctx);
+
+                SimpleModule simpleModule = new SimpleModule();
+                simpleModule.addDeserializer(Subject.class,new DeserializerForChangeSubject());
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.registerModule(simpleModule);
+
                 Subject s = objectMapper.readValue(ctx.body(),Subject.class);
-                checkDoesSubjectWithSuchNameExists(s.getName());
+
                 subjectDao.update(s);
                 updated(ctx);
             }else youAreNotAdmin(ctx);

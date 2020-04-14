@@ -7,15 +7,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
 import com.github.bogdan.exceptions.WebException;
-import com.github.bogdan.modals.Attendance;
-import com.github.bogdan.modals.Group;
-import com.github.bogdan.modals.User;
+import com.github.bogdan.models.Attendance;
+import com.github.bogdan.models.Group;
+import com.github.bogdan.models.User;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalDate;
 
 import static com.github.bogdan.services.DeserializerService.*;
 import static com.github.bogdan.services.LocalDateService.checkLocalDateFormat;

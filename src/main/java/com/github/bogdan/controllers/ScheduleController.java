@@ -7,11 +7,14 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
 import com.github.bogdan.deserializer.DeserializerForChangeSchedule;
 import com.github.bogdan.deserializer.ScheduleDeserializer;
-import com.github.bogdan.modals.Role;
-import com.github.bogdan.modals.Schedule;
+import com.github.bogdan.models.Role;
+import com.github.bogdan.models.Schedule;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import io.javalin.http.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import static com.github.bogdan.services.AuthService.authorization;
@@ -81,7 +84,9 @@ public class ScheduleController {
                 objectMapper.registerModule(simpleModule);
 
                 Schedule s = objectMapper.readValue(ctx.body(),Schedule.class);
-                checkDoesThisSchedulePossibleExceptOne(s,s.getId());
+                Logger logger = LoggerFactory.getLogger(Schedule.class);
+                logger.info(s.toString());
+                checkDoesThisSchedulePossibleExceptOne(s);
                 checkDoesSuchScheduleRecordExist(s);
                 scheduleDao.update(s);
                 updated(ctx);

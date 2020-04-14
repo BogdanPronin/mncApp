@@ -2,7 +2,7 @@ package com.github.bogdan.services;
 
 import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
 import com.github.bogdan.exceptions.WebException;
-import com.github.bogdan.modals.Schedule;
+import com.github.bogdan.models.Schedule;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import org.slf4j.Logger;
@@ -20,19 +20,31 @@ public class ScheduleService {
         checkLocalDateTimeFormat(currentSchedule.getEndOfTheLesson());
         checkValidTime(currentSchedule.getStartOfTheLesson(),currentSchedule.getEndOfTheLesson());
         for(Schedule schedule:scheduleDao){
+
             if(schedule.getCabinet()==currentSchedule.getCabinet() && schedule.getDay()==currentSchedule.getDay()){
                 checkForOverlappingTime(schedule.getStartOfTheLesson(),schedule.getEndOfTheLesson(),currentSchedule.getStartOfTheLesson(),currentSchedule.getEndOfTheLesson());
             }
+            if(schedule.getGroup().getId()==currentSchedule.getGroup().getId() && schedule.getDay()==currentSchedule.getDay()){
+                checkDoesGroupHaveTheLessonOnThisTime(currentSchedule.getStartOfTheLesson(),currentSchedule.getEndOfTheLesson(),currentSchedule.getGroup().getId());
+            }
         }
     }
-    public static void checkDoesThisSchedulePossibleExceptOne(Schedule currentSchedule,int exceptedId) throws SQLException {
+    public static void checkDoesThisSchedulePossibleExceptOne(Schedule currentSchedule) throws SQLException {
         Dao<Schedule,Integer> scheduleDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,Schedule.class);
         checkLocalDateTimeFormat(currentSchedule.getStartOfTheLesson());
         checkLocalDateTimeFormat(currentSchedule.getEndOfTheLesson());
         checkValidTime(currentSchedule.getStartOfTheLesson(),currentSchedule.getEndOfTheLesson());
         for(Schedule schedule:scheduleDao){
-            if(schedule.getId()!= exceptedId && schedule.getCabinet()==currentSchedule.getCabinet() && schedule.getDay()==currentSchedule.getDay()){
+            if(schedule.getId()!= currentSchedule.getId() && schedule.getCabinet()==currentSchedule.getCabinet() && schedule.getDay()==currentSchedule.getDay()){
                 checkForOverlappingTime(schedule.getStartOfTheLesson(),schedule.getEndOfTheLesson(),currentSchedule.getStartOfTheLesson(),currentSchedule.getEndOfTheLesson());
+            }
+        }
+    }
+    public static void checkDoesGroupHaveTheLessonOnThisTime(String startOfTheLesson, String endOfTheLesson, int groupId) throws SQLException {
+        Dao<Schedule,Integer> scheduleDao = DaoManager.createDao(DatabaseConfiguration.connectionSource,Schedule.class);
+        for(Schedule schedule:scheduleDao.queryForAll()){
+            if(schedule.getGroup().getId()==groupId){
+                checkForOverlappingTime(schedule.getStartOfTheLesson(),schedule.getEndOfTheLesson(),startOfTheLesson,endOfTheLesson,"At this time, this group is engaged");
             }
         }
     }

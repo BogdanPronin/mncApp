@@ -1,9 +1,9 @@
-package com.github.bogdan.modals;
+package com.github.bogdan.models;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import java.time.LocalDateTime;
+import java.util.Objects;
 
 @DatabaseTable(tableName = "schedule")
 public class Schedule {
@@ -77,5 +77,35 @@ public class Schedule {
 
     public void setGroup(Group group) {
         this.group = group;
+    }
+
+    @Override
+    public String toString() {
+        return "Schedule{" +
+                "id=" + id +
+                ", startOfTheLesson='" + startOfTheLesson + '\'' +
+                ", endOfTheLesson='" + endOfTheLesson + '\'' +
+                ", day=" + day +
+                ", cabinet=" + cabinet +
+                ", group=" + group +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Schedule schedule = (Schedule) o;
+        return id == schedule.id &&
+                cabinet == schedule.cabinet &&
+                Objects.equals(startOfTheLesson, schedule.startOfTheLesson) &&
+                Objects.equals(endOfTheLesson, schedule.endOfTheLesson) &&
+                day == schedule.day &&
+                Objects.equals(group, schedule.group);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, startOfTheLesson, endOfTheLesson, day, cabinet, group);
     }
 }

@@ -4,8 +4,7 @@ import com.github.bogdan.controllers.*;
 import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
 import com.github.bogdan.exceptions.MyException;
 import com.github.bogdan.exceptions.WebException;
-import com.github.bogdan.modals.*;
-import com.google.i18n.phonenumbers.NumberParseException;
+import com.github.bogdan.models.*;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import io.javalin.Javalin;
@@ -33,12 +32,11 @@ public class Main {
         app.get("/users/:id",ctx -> UserController.getUser(ctx,userDao));
         app.get("/users",ctx -> UserController.getUsers(ctx,userDao));
 
-
         app.post("/subjects", ctx -> SubjectController.add(ctx, subjectDao));
         app.delete("/subjects/:id",ctx -> SubjectController.delete(ctx,subjectDao));
         app.get("/subjects",ctx-> SubjectController.get(ctx,subjectDao));
         app.get("/subjects/:id",ctx-> SubjectController.getById(ctx,subjectDao));
-        app.patch("/subjects/:id",ctx-> SubjectController.getById(ctx,subjectDao));
+        app.patch("/subjects",ctx-> SubjectController.change(ctx,subjectDao));
 
         app.post("/schedule", ctx -> ScheduleController.add(ctx, scheduleDao));
         app.delete("/schedule/:id",ctx -> ScheduleController.delete(ctx,scheduleDao));
@@ -57,6 +55,7 @@ public class Main {
         app.delete("/userGroup/:id",ctx -> UserGroupController.deleteRecord(ctx,userGroupDao));
         app.get("/userGroup/:id",ctx-> UserGroupController.getById(ctx,userGroupDao));
         app.get("/userGroup",ctx-> UserGroupController.get(ctx,userGroupDao));
+        app.patch("/userGroup", ctx -> UserGroupController.change(ctx,userGroupDao));
 
         app.post("/attendance",ctx-> AttendanceController.add(ctx,attendanceDao));
         app.get("/attendance",ctx-> AttendanceController.get(ctx,attendanceDao));

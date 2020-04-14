@@ -1,7 +1,9 @@
-package com.github.bogdan.modals;
+package com.github.bogdan.models;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+
+import java.util.Objects;
 
 @DatabaseTable(tableName = "user")
 public class User {
@@ -108,5 +110,26 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id &&
+                Objects.equals(fname, user.fname) &&
+                Objects.equals(lname, user.lname) &&
+                Objects.equals(phone, user.phone) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(dateOfRegister, user.dateOfRegister) &&
+                Objects.equals(login, user.login) &&
+                Objects.equals(password, user.password) &&
+                role == user.role;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, fname, lname, phone, email, dateOfRegister, login, password, role);
     }
 }

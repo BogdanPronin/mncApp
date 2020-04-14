@@ -8,9 +8,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
 import com.github.bogdan.exceptions.WebException;
-import com.github.bogdan.modals.Group;
-import com.github.bogdan.modals.User;
-import com.github.bogdan.modals.UserGroup;
+import com.github.bogdan.models.Group;
+import com.github.bogdan.models.User;
+import com.github.bogdan.models.UserGroup;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 

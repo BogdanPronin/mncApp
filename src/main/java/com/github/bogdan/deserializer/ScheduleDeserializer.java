@@ -8,9 +8,9 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import com.github.bogdan.databaseConfiguration.DatabaseConfiguration;
 import com.github.bogdan.exceptions.WebException;
-import com.github.bogdan.modals.Days;
-import com.github.bogdan.modals.Group;
-import com.github.bogdan.modals.Schedule;
+import com.github.bogdan.models.Days;
+import com.github.bogdan.models.Group;
+import com.github.bogdan.models.Schedule;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 
