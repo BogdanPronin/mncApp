@@ -19,15 +19,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import static com.github.bogdan.services.AuthService.authorization;
 import static com.github.bogdan.services.ContextService.*;
+import static com.github.bogdan.services.PaginationService.getPage;
 import static com.github.bogdan.services.ScheduleService.*;
 import static com.github.bogdan.services.UserService.getUserByLogin;
 
 public class ScheduleController {
     public static void add(Context ctx, Dao<Schedule,Integer> scheduleDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
-                checkDoesRequestBodyIsEmpty(ctx);
+                checkDoesRequestBodyEmpty(ctx);
                 SimpleModule simpleModule = new SimpleModule();
                 simpleModule.addDeserializer(Schedule.class,new ScheduleDeserializer());
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -43,7 +44,7 @@ public class ScheduleController {
 
     }
     public static void delete(Context ctx, Dao<Schedule,Integer> scheduleDao) throws SQLException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
                 int id = Integer.parseInt(ctx.pathParam("id"));
@@ -54,16 +55,20 @@ public class ScheduleController {
         }else authorizationFailed(ctx);
     }
     public static void get(Context ctx, Dao<Schedule,Integer> scheduleDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
                 ObjectMapper objectMapper = new ObjectMapper();
-                ctx.result(objectMapper.writeValueAsString(scheduleDao.queryForAll()));
+                checkDoesQueryParamEmpty(ctx,"page");
+                checkDoesQueryParamEmpty(ctx,"size");
+                int page = Integer.parseInt(ctx.queryParam("page"));
+                int size = Integer.parseInt(ctx.queryParam("size"));
+                ctx.result(objectMapper.writeValueAsString(getPage(scheduleDao,page,size)));
             }else youAreNotAdmin(ctx);
         }else authorizationFailed(ctx);
     }
     public static void getById(Context ctx, Dao<Schedule,Integer> scheduleDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -74,10 +79,10 @@ public class ScheduleController {
         }else authorizationFailed(ctx);
     }
     public static void change(Context ctx, Dao<Schedule,Integer> scheduleDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
-                checkDoesRequestBodyIsEmpty(ctx);
+                checkDoesRequestBodyEmpty(ctx);
                 SimpleModule simpleModule = new SimpleModule();
                 simpleModule.addDeserializer(Schedule.class,new DeserializerForChangeSchedule());
                 ObjectMapper objectMapper = new ObjectMapper();

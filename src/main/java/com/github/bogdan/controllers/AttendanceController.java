@@ -16,18 +16,19 @@ import static com.github.bogdan.services.AttendanceService.checkDoesSuchAttendan
 import static com.github.bogdan.services.AttendanceService.checkUniqueAttendance;
 import static com.github.bogdan.services.AuthService.*;
 import static com.github.bogdan.services.ContextService.*;
+import static com.github.bogdan.services.PaginationService.getPage;
 import static com.github.bogdan.services.UserService.*;
 
 public class AttendanceController {
     public static void add(Context ctx, Dao<Attendance,Integer> attendanceDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
 
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
 
         checkAuthorization(login,password,ctx);
 
-        checkDoesRequestBodyIsEmpty(ctx);
+        checkDoesRequestBodyEmpty(ctx);
 
         if(getUserByLogin(login).getRole()== Role.ADMIN){
             SimpleModule simpleModule = new SimpleModule();
@@ -41,7 +42,7 @@ public class AttendanceController {
         }else youAreNotAdmin(ctx);
     }
     public static void delete(Context ctx, Dao<Attendance,Integer> attendanceDao) throws SQLException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         checkAuthorization(login,password,ctx);
@@ -53,7 +54,7 @@ public class AttendanceController {
         }else youAreNotAdmin(ctx);
     }
     public static void get(Context ctx, Dao<Attendance,Integer> attendanceDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         checkAuthorization(login,password,ctx);
@@ -62,13 +63,16 @@ public class AttendanceController {
             simpleModule.addSerializer(User.class, new UserForGroupSerializer());
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(simpleModule);
-
-            ctx.result(objectMapper.writeValueAsString(attendanceDao.queryForAll()));
+            checkDoesQueryParamEmpty(ctx,"page");
+            checkDoesQueryParamEmpty(ctx,"size");
+            int page = Integer.parseInt(ctx.queryParam("page"));
+            int size = Integer.parseInt(ctx.queryParam("size"));
+            ctx.result(objectMapper.writeValueAsString(getPage(attendanceDao,page,size)));
             ctx.status(200);
         }else youAreNotAdmin(ctx);
     }
     public static void getById(Context ctx, Dao<Attendance,Integer> attendanceDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         checkAuthorization(login,password,ctx);
@@ -81,12 +85,12 @@ public class AttendanceController {
         }else youAreNotAdmin(ctx);
     }
     public static void change(Context ctx, Dao<Attendance,Integer> attendanceDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         checkAuthorization(login,password,ctx);
         if(getUserByLogin(login).getRole()== Role.ADMIN){
-            checkDoesRequestBodyIsEmpty(ctx);
+            checkDoesRequestBodyEmpty(ctx);
             SimpleModule simpleModule = new SimpleModule();
             simpleModule.addDeserializer(Attendance.class,new DeserializerForChangeAttendance());
             ObjectMapper objectMapper = new ObjectMapper();

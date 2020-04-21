@@ -2,6 +2,7 @@ package com.github.bogdan.services;
 
 
 import com.github.bogdan.exceptions.MyException;
+import com.github.bogdan.exceptions.WebException;
 import io.javalin.http.Context;
 
 public class ContextService {
@@ -25,16 +26,21 @@ public class ContextService {
         ctx.status(200);
         ctx.result("Deleted");
     }
-    public static void checkDoesBasicAuthIsEmpty(Context ctx){
+    public static void checkDoesBasicAuthEmpty(Context ctx){
         if (!ctx.basicAuthCredentialsExist()){
             ctx.status(400);
             throw new MyException("Basic auth is empty");
         }
     }
-    public static void checkDoesRequestBodyIsEmpty(Context ctx){
+    public static void checkDoesRequestBodyEmpty(Context ctx){
         if(ctx.body().isEmpty()) {
             ctx.status(401);
             throw new MyException("Request body is empty");
+        }
+    }
+    public static void checkDoesQueryParamEmpty(Context ctx, String key){
+        if(ctx.queryParam(key)==null){
+            throw new WebException("Parameter \""+key+ "\" is empty",400);
         }
     }
 }

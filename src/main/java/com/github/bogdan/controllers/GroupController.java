@@ -22,14 +22,15 @@ import static com.github.bogdan.services.ContextService.*;
 import static com.github.bogdan.services.GroupService.checkDoesGroupWithSuchIdExist;
 import static com.github.bogdan.services.GroupService.checkDoesGroupWithSuchNameExist;
 import static com.github.bogdan.services.LocalDateService.checkLocalDateFormat;
+import static com.github.bogdan.services.PaginationService.getPage;
 import static com.github.bogdan.services.UserService.*;
 
 public class GroupController {
     public static void add(Context ctx, Dao<Group,Integer> groupDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
-                checkDoesRequestBodyIsEmpty(ctx);
+                checkDoesRequestBodyEmpty(ctx);
                 String body = ctx.body();
                 SimpleModule simpleModule = new SimpleModule();
                 simpleModule.addDeserializer(Group.class,new DeserializerForAddGroup());
@@ -45,7 +46,7 @@ public class GroupController {
         }else authorizationFailed(ctx);
     }
     public static void delete(Context ctx, Dao<Group,Integer> groupDao) throws SQLException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
                 int id = Integer.parseInt(ctx.pathParam("id"));
@@ -56,7 +57,7 @@ public class GroupController {
         }else authorizationFailed(ctx);
     }
     public static void get(Context ctx, Dao<Group,Integer> groupDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         if(authorization(login,password)){
@@ -66,14 +67,17 @@ public class GroupController {
             simpleModule.addSerializer(Schedule.class,new ScheduleForGroupSerializer());
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(simpleModule);
-
-            String serialized = objectMapper.writeValueAsString(groupDao.queryForAll());
+            checkDoesQueryParamEmpty(ctx,"page");
+            checkDoesQueryParamEmpty(ctx,"size");
+            int page = Integer.parseInt(ctx.queryParam("page"));
+            int size = Integer.parseInt(ctx.queryParam("size"));
+            String serialized = objectMapper.writeValueAsString(getPage(groupDao,page,size));
             ctx.result(serialized);
             ctx.status(200);
         }
     }
     public static void getById(Context ctx, Dao<Group,Integer> groupDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         if(authorization(login,password)){
@@ -92,10 +96,10 @@ public class GroupController {
         }
     }
     public static void change(Context ctx, Dao<Group,Integer> groupDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())){
             if(getUserByLogin(ctx.basicAuthCredentials().getUsername()).getRole()== Role.ADMIN){
-                checkDoesRequestBodyIsEmpty(ctx);
+                checkDoesRequestBodyEmpty(ctx);
                 String body = ctx.body();
                 SimpleModule simpleModule = new SimpleModule();
                 simpleModule.addDeserializer(Group.class,new DeserializerForChangeGroup());

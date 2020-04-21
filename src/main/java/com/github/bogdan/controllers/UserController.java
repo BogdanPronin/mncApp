@@ -18,11 +18,12 @@ import java.sql.SQLException;
 
 import static com.github.bogdan.services.AuthService.*;
 import static com.github.bogdan.services.ContextService.*;
+import static com.github.bogdan.services.PaginationService.getPage;
 import static com.github.bogdan.services.UserService.*;
 
 public class UserController {
     public static void add(Context ctx, Dao<User,Integer> userDao) throws JsonProcessingException, NumberParseException, SQLException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String body = ctx.body();
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addDeserializer(User.class,new DeserializerForAddUser());
@@ -34,9 +35,9 @@ public class UserController {
         created(ctx);
     }
     public static void changeUser(Context ctx, Dao<User,Integer> userDao) throws SQLException, JsonProcessingException, NumberParseException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         if(authorization(ctx.basicAuthCredentials().getUsername(),ctx.basicAuthCredentials().getPassword())) {
-            checkDoesRequestBodyIsEmpty(ctx);
+            checkDoesRequestBodyEmpty(ctx);
             String body = ctx.body();
             SimpleModule simpleModule = new SimpleModule();
             simpleModule.addDeserializer(User.class, new DeserializerForChangeUser());
@@ -78,7 +79,7 @@ public class UserController {
 
     }
     public static void delete(Context ctx, Dao<User,Integer> userDao) throws SQLException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
 
@@ -100,7 +101,7 @@ public class UserController {
         }else authorizationFailed(ctx);
     }
     public static void getUser(Context ctx, Dao<User,Integer> userDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         int id = Integer.parseInt(ctx.pathParam("id"));
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
@@ -116,7 +117,7 @@ public class UserController {
         }else authorizationFailed(ctx);
     }
     public static void getUsers(Context ctx, Dao<User,Integer> userDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         if(authorization(login,password)){
@@ -124,9 +125,14 @@ public class UserController {
             simpleModule.addSerializer(User.class, new UserGetSerializer());
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(simpleModule);
-            String serialized = objectMapper.writeValueAsString(userDao.queryForAll());
+            checkDoesQueryParamEmpty(ctx,"page");
+            checkDoesQueryParamEmpty(ctx,"size");
+            int page = Integer.parseInt(ctx.queryParam("page"));
+            int size = Integer.parseInt(ctx.queryParam("size"));
+            String serialized = objectMapper.writeValueAsString(getPage(userDao,page,size));
             ctx.result(serialized);
             ctx.status(200);
+
         }else authorizationFailed(ctx);
     }
 }

@@ -13,25 +13,24 @@ import com.github.bogdan.models.UserGroup;
 import com.github.bogdan.serializer.UserForGroupSerializer;
 import com.j256.ormlite.dao.Dao;
 import io.javalin.http.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 
 import static com.github.bogdan.services.AuthService.*;
 import static com.github.bogdan.services.ContextService.*;
+import static com.github.bogdan.services.PaginationService.getPage;
 import static com.github.bogdan.services.UserGroupService.checkDoesSuchRecordExist;
 import static com.github.bogdan.services.UserGroupService.getUserGroup;
 import static com.github.bogdan.services.UserService.*;
 
 public class UserGroupController {
     public static void add(Context ctx,Dao<UserGroup,Integer> userGroupDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         checkAuthorization(login,password,ctx);
         if(getUserByLogin(login).getRole()==Role.ADMIN){
-            checkDoesRequestBodyIsEmpty(ctx);
+            checkDoesRequestBodyEmpty(ctx);
             SimpleModule simpleModule = new SimpleModule();
             simpleModule.addDeserializer(UserGroup.class, new UserGroupDeserializer());
             ObjectMapper objectMapper = new ObjectMapper();
@@ -44,7 +43,7 @@ public class UserGroupController {
         }else youAreNotAdmin(ctx);
     }
     public static void get(Context ctx,Dao<UserGroup,Integer> userGroupDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         checkAuthorization(login,password,ctx);
@@ -53,13 +52,16 @@ public class UserGroupController {
             simpleModule.addSerializer(User.class, new UserForGroupSerializer());
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(simpleModule);
-
-            ctx.result(objectMapper.writeValueAsString(userGroupDao.queryForAll()));
+            checkDoesQueryParamEmpty(ctx,"page");
+            checkDoesQueryParamEmpty(ctx,"size");
+            int page = Integer.parseInt(ctx.queryParam("page"));
+            int size = Integer.parseInt(ctx.queryParam("size"));
+            ctx.result(objectMapper.writeValueAsString(getPage(userGroupDao,page,size)));
             ctx.status(200);
         }else youAreNotAdmin(ctx);
     }
     public static void getById(Context ctx,Dao<UserGroup,Integer> userGroupDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         checkAuthorization(login,password,ctx);
@@ -76,12 +78,12 @@ public class UserGroupController {
         }else youAreNotAdmin(ctx);
     }
     public static void change(Context ctx,Dao<UserGroup,Integer> userGroupDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         checkAuthorization(login,password,ctx);
         if(getUserByLogin(login).getRole()==Role.ADMIN){
-            checkDoesRequestBodyIsEmpty(ctx);
+            checkDoesRequestBodyEmpty(ctx);
             SimpleModule simpleModule = new SimpleModule();
             simpleModule.addDeserializer(UserGroup.class, new DeserializerForChangeUserGroup());
             ObjectMapper objectMapper = new ObjectMapper();
@@ -95,12 +97,12 @@ public class UserGroupController {
         }else youAreNotAdmin(ctx);
     }
     public static void deleteUserFromGroup(Context ctx,Dao<UserGroup,Integer> userGroupDao) throws SQLException, JsonProcessingException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         checkAuthorization(login,password,ctx);
         if(getUserByLogin(login).getRole()==Role.ADMIN){
-            checkDoesRequestBodyIsEmpty(ctx);
+            checkDoesRequestBodyEmpty(ctx);
             SimpleModule simpleModule = new SimpleModule();
             simpleModule.addDeserializer(UserGroup.class, new DeserializerForDeleteUserFromGroup());
             ObjectMapper objectMapper = new ObjectMapper();
@@ -116,7 +118,7 @@ public class UserGroupController {
         }else youAreNotAdmin(ctx);
     }
     public static void deleteRecord(Context ctx,Dao<UserGroup,Integer> userGroupDao) throws SQLException {
-        checkDoesBasicAuthIsEmpty(ctx);
+        checkDoesBasicAuthEmpty(ctx);
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         checkAuthorization(login,password,ctx);

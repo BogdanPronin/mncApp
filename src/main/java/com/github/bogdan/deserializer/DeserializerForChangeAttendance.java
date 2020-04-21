@@ -100,7 +100,7 @@ public class DeserializerForChangeAttendance extends StdDeserializer<Attendance>
 
             boolean isValidReason = true;
             if(isAttends){
-                attendance.setValidReason(true);
+                attendance.setValidReason(false);
             }else if(node instanceof NullNode){
                 attendance.setValidReason(attendanceBase.isValidReason());
             }else if(node.get("isValidReason") == null){
