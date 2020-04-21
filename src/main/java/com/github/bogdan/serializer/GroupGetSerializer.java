@@ -22,6 +22,7 @@ public class GroupGetSerializer extends StdSerializer<Group> {
     @Override
     public void serialize(Group group, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
+        jsonGenerator.writeNumberField("id",group.getId());
         jsonGenerator.writeStringField("groupName",group.getGroupName());
         jsonGenerator.writeObjectField("subject",group.getSubject());
         jsonGenerator.writeStringField("dateOfTheCreation",group.getDateOfTheCreation());

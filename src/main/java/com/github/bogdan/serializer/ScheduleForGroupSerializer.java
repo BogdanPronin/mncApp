@@ -16,6 +16,7 @@ public class ScheduleForGroupSerializer extends StdSerializer<Schedule> {
     @Override
     public void serialize(Schedule schedule, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
+        jsonGenerator.writeNumberField("id",schedule.getId());
         jsonGenerator.writeStringField("startOfTheLesson",schedule.getStartOfTheLesson());
         jsonGenerator.writeStringField("endOfTheLesson",schedule.getEndOfTheLesson());
         jsonGenerator.writeStringField("day",schedule.getDay().toString());

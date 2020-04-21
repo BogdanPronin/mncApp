@@ -14,6 +14,7 @@ public class UserForGroupSerializer extends StdSerializer<User> {
     @Override
     public void serialize(User user, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
+        jsonGenerator.writeNumberField("id",user.getId());
         jsonGenerator.writeStringField("fname",user.getFname());
         jsonGenerator.writeStringField("lname",user.getLname());
         jsonGenerator.writeStringField("phone",user.getPhone());
