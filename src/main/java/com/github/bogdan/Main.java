@@ -29,8 +29,8 @@ public class Main {
         app.post("/users", ctx -> UserController.add(ctx, userDao));
         app.patch("/users",ctx->UserController.changeUser(ctx,userDao));
         app.delete("/users/:id",ctx-> UserController.delete(ctx,userDao));
-        app.get("/users/:id",ctx -> UserController.getUser(ctx,userDao));
-        app.get("/users",ctx -> UserController.getUsers(ctx,userDao));
+        app.get("/users",ctx -> UserController.getUser(ctx,userDao));
+       // app.get("/users",ctx -> UserController.getUsers(ctx,userDao));
 
         app.post("/subjects", ctx -> SubjectController.add(ctx, subjectDao));
         app.delete("/subjects/:id",ctx -> SubjectController.delete(ctx,subjectDao));

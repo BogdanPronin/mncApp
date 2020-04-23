@@ -43,4 +43,10 @@ public class ContextService {
             throw new WebException("Parameter \""+key+ "\" is empty",400);
         }
     }
+    public static boolean doesQueryParamEmpty(Context ctx, String key){
+        if(ctx.queryParam(key)==null){
+            return true;
+        }
+        return false;
+    }
 }

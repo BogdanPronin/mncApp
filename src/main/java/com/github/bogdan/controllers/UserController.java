@@ -14,6 +14,7 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.j256.ormlite.dao.Dao;
 import io.javalin.http.Context;
 
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 
 import static com.github.bogdan.services.AuthService.*;
@@ -23,7 +24,6 @@ import static com.github.bogdan.services.UserService.*;
 
 public class UserController {
     public static void add(Context ctx, Dao<User,Integer> userDao) throws JsonProcessingException, NumberParseException, SQLException {
-        checkDoesBasicAuthEmpty(ctx);
         String body = ctx.body();
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addDeserializer(User.class,new DeserializerForAddUser());
@@ -102,16 +102,19 @@ public class UserController {
     }
     public static void getUser(Context ctx, Dao<User,Integer> userDao) throws SQLException, JsonProcessingException {
         checkDoesBasicAuthEmpty(ctx);
-        int id = Integer.parseInt(ctx.pathParam("id"));
         String login = ctx.basicAuthCredentials().getUsername();
         String password = ctx.basicAuthCredentials().getPassword();
         if(authorization(login,password)){
-            checkDoesUserWithSuchIdExists(id);
+            checkDoesUserQueryParamEmpty(ctx);
+
             SimpleModule simpleModule = new SimpleModule();
             simpleModule.addSerializer(User.class, new UserGetSerializer());
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(simpleModule);
-            String serialized = objectMapper.writeValueAsString(userDao.queryForId(id));
+            if(getUsersByQueryParams(ctx).isEmpty()){
+                throw new WebException("Such users isn't exist",400);
+            }
+            String serialized = objectMapper.writeValueAsString(getUsersByQueryParams(ctx));
             ctx.result(serialized);
             ctx.status(200);
         }else authorizationFailed(ctx);
@@ -131,6 +134,7 @@ public class UserController {
             int size = Integer.parseInt(ctx.queryParam("size"));
             String serialized = objectMapper.writeValueAsString(getPage(userDao,page,size));
             ctx.result(serialized);
+            ctx.header("content-type:app/json");
             ctx.status(200);
 
         }else authorizationFailed(ctx);

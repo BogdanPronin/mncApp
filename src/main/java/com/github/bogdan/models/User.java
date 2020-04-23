@@ -111,7 +111,25 @@ public class User {
     public void setRole(Role role) {
         this.role = role;
     }
-
+    public String getKey(String key){
+        switch(key){
+            case "fname":
+                return this.fname;
+            case "lname":
+                return this.lname;
+            case "email":
+                return this.email;
+            case "login":
+                return this.login;
+            case "role":
+                return this.role.toString();
+            case "dateOfRegister":
+                return this.dateOfRegister;
+            case "id":
+                return String.valueOf(id);
+        }
+        return null;
+    }
     @Override
     public String toString() {
         return "User{" +
